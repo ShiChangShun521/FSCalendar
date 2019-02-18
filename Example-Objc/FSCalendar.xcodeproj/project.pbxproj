@@ -119,6 +119,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		241AFBBE221A5713007576D9 /* SFSCalendar.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = SFSCalendar.podspec; path = ../SFSCalendar.podspec; sourceTree = "<group>"; };
 		30024F931BD1015300B1C04C /* DelegateAppearanceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelegateAppearanceViewController.h; sourceTree = SOURCE_ROOT; };
 		30024F941BD1015300B1C04C /* DelegateAppearanceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DelegateAppearanceViewController.m; sourceTree = SOURCE_ROOT; };
 		301F79C91DFD39E700D8631E /* FSCalendarDelegationProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSCalendarDelegationProxy.h; sourceTree = "<group>"; };
@@ -318,6 +319,7 @@
 		EE0D7FBE1B89C5D3003C287B = {
 			isa = PBXGroup;
 			children = (
+				241AFBBE221A5713007576D9 /* SFSCalendar.podspec */,
 				30B0BABC1B8D8E22004B9476 /* FSCalendar */,
 				EE0D7FC91B89C5D3003C287B /* Example */,
 				EE638CF21B8A1F550006DD1A /* FSCalendarTests */,
