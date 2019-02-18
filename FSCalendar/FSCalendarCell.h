@@ -17,6 +17,11 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 #pragma mark - Public properties
 
 /**
+ * subTitle 是否在圈外
+ */
+@property (nonatomic, assign) BOOL subTitleIsOutsideCircle;
+
+/**
  The day text label of the cell
  */
 @property (weak, nonatomic) UILabel  *titleLabel;
@@ -32,6 +37,10 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
  The shape layer of the cell
  */
 @property (weak, nonatomic) CAShapeLayer *shapeLayer;
+/**外层的*/
+@property (nonatomic,weak) CAShapeLayer *outsideShapLayer;
+
+@property (nonatomic,weak) UIView *outsideView;
 
 /**
  The imageView below shape layer of the cell
@@ -52,6 +61,7 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 #pragma mark - Private properties
 
 @property (weak, nonatomic) FSCalendar *calendar;
+
 @property (weak, nonatomic) FSCalendarAppearance *appearance;
 
 @property (strong, nonatomic) NSString *subtitle;
@@ -69,6 +79,7 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 @property (strong, nonatomic) UIColor *preferredSubtitleDefaultColor;
 @property (strong, nonatomic) UIColor *preferredSubtitleSelectionColor;
 @property (strong, nonatomic) UIColor *preferredBorderDefaultColor;
+@property (strong, nonatomic)  UIColor *preferredOutsideBorderDefaultColor;
 @property (strong, nonatomic) UIColor *preferredBorderSelectionColor;
 @property (assign, nonatomic) CGPoint preferredTitleOffset;
 @property (assign, nonatomic) CGPoint preferredSubtitleOffset;

@@ -194,6 +194,12 @@ typedef NS_OPTIONS(NSUInteger, FSCalendarCaseOptions) {
 @property (assign, nonatomic) CGFloat borderRadius;
 
 /**
+ 实线圆 或者虚线圆 2:圆，1：虚线
+ */
+@property (nonatomic,assign) NSInteger borderType;
+
+
+/**
  * The case options manage the case of month label and weekday symbols.
  *
  * @see FSCalendarCaseOptions
@@ -214,6 +220,21 @@ typedef NS_OPTIONS(NSUInteger, FSCalendarCaseOptions) {
 @property (assign, nonatomic) NSInteger fakedSelectedDay;
 
 #endif
+
+@end
+
+/**
+ * These functions and attributes are deprecated.
+ */
+@interface FSCalendarAppearance (Deprecated)
+
+@property (assign, nonatomic) BOOL useVeryShortWeekdaySymbols FSCalendarDeprecated('caseOptions');
+@property (assign, nonatomic) CGFloat titleVerticalOffset FSCalendarDeprecated('titleOffset');
+@property (assign, nonatomic) CGFloat subtitleVerticalOffset FSCalendarDeprecated('subtitleOffset');
+@property (strong, nonatomic) UIColor *eventColor FSCalendarDeprecated('eventDefaultColor');
+@property (assign, nonatomic) FSCalendarCellShape cellShape FSCalendarDeprecated('borderRadius');
+@property (assign, nonatomic) BOOL adjustsFontSizeToFitContentSize DEPRECATED_MSG_ATTRIBUTE("The attribute \'adjustsFontSizeToFitContentSize\' is not neccesary anymore.");
+- (void)invalidateAppearance FSCalendarDeprecated('FSCalendar setNeedsConfigureAppearance');
 
 @end
 

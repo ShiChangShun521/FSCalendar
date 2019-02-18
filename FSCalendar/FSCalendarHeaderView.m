@@ -12,7 +12,7 @@
 #import "FSCalendarCollectionView.h"
 #import "FSCalendarDynamicHeader.h"
 
-@interface FSCalendarHeaderView ()<UICollectionViewDataSource,UICollectionViewDelegate,FSCalendarCollectionViewInternalDelegate>
+@interface FSCalendarHeaderView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 - (void)scrollToOffset:(CGFloat)scrollOffset animated:(BOOL)animated;
 - (void)configureCell:(FSCalendarHeaderCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -43,6 +43,8 @@
 
 - (void)initialize
 {
+    _needsAdjustingViewFrame = YES;
+    _needsAdjustingMonthPosition = YES;
     _scrollDirection = UICollectionViewScrollDirectionHorizontal;
     _scrollEnabled = YES;
     
@@ -65,16 +67,33 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    self.collectionView.frame = CGRectMake(0, self.fs_height*0.1, self.fs_width, self.fs_height*0.9);
+    
+    if (_needsAdjustingViewFrame) {
+        _needsAdjustingViewFrame = NO;
+        _collectionViewLayout.itemSize = CGSizeMake(1, 1);
+        [_collectionViewLayout invalidateLayout];
+        _collectionView.frame = CGRectMake(0, self.fs_height*0.1, self.fs_width, self.fs_height*0.9);
+    }
+    
+    if (_needsAdjustingMonthPosition) {
+        _needsAdjustingMonthPosition = NO;
+        [self scrollToOffset:_scrollOffset animated:NO];
+    }
+    
 }
 
 - (void)dealloc
 {
-    self.collectionView.dataSource = nil;
-    self.collectionView.delegate = nil;
+    _collectionView.dataSource = nil;
+    _collectionView.delegate = nil;
 }
 
 #pragma mark - <UICollectionViewDataSource>
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
+    return 1;
+}
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
@@ -91,6 +110,11 @@
     cell.header = self;
     [self configureCell:cell atIndexPath:indexPath];
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    [cell setNeedsLayout];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -113,6 +137,9 @@
 
 - (void)setScrollOffset:(CGFloat)scrollOffset animated:(BOOL)animated
 {
+    if (_scrollOffset != scrollOffset) {
+        _scrollOffset = scrollOffset;
+    }
     [self scrollToOffset:scrollOffset animated:NO];
 }
 
@@ -132,6 +159,7 @@
     if (_scrollDirection != scrollDirection) {
         _scrollDirection = scrollDirection;
         _collectionViewLayout.scrollDirection = scrollDirection;
+        _needsAdjustingMonthPosition = YES;
         [self setNeedsLayout];
     }
 }
@@ -223,7 +251,7 @@
 - (void)setBounds:(CGRect)bounds
 {
     [super setBounds:bounds];
-    self.titleLabel.frame = bounds;
+    _titleLabel.frame = bounds;
 }
 
 - (void)layoutSubviews
@@ -245,6 +273,7 @@
         CGFloat center = CGRectGetMidY(self.header.bounds);
         self.contentView.alpha = 1.0 - (1.0-self.header.calendar.appearance.headerMinimumDissolvedAlpha)*ABS(center-position)/self.fs_height;
     }
+    
 }
 
 @end
@@ -261,14 +290,8 @@
         self.minimumLineSpacing = 0;
         self.sectionInset = UIEdgeInsetsZero;
         self.itemSize = CGSizeMake(1, 1);
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveOrientationChangeNotification:) name:UIDeviceOrientationDidChangeNotification object:nil];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)prepareLayout
@@ -280,16 +303,6 @@
                                self.collectionView.fs_height
                               );
     
-}
-
-- (void)didReceiveOrientationChangeNotification:(NSNotification *)notificatino
-{
-    [self invalidateLayout];
-}
-
-- (BOOL)flipsHorizontallyInOppositeLayoutDirection
-{
-    return YES;
 }
 
 @end

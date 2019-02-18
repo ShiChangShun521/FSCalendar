@@ -454,6 +454,10 @@
 {
     self.titleOffset = CGPointMake(0, titleVerticalOffset);
 }
+- (void)setBorderType:(NSInteger)borderType
+{
+    _borderType = borderType;
+}
 
 - (CGFloat)titleVerticalOffset
 {
@@ -478,6 +482,16 @@
 - (UIColor *)eventColor
 {
     return self.eventDefaultColor;
+}
+
+- (void)setCellShape:(FSCalendarCellShape)cellShape
+{
+    self.borderRadius = 1-cellShape;
+}
+
+- (FSCalendarCellShape)cellShape
+{
+    return self.borderRadius==1.0?FSCalendarCellShapeCircle:FSCalendarCellShapeRectangle;
 }
 
 - (void)setTitleTextSize:(CGFloat)titleTextSize
@@ -505,5 +519,9 @@
     [self.calendar configureAppearance];
 }
 
+- (void)setAdjustsFontSizeToFitContentSize:(BOOL)adjustsFontSizeToFitContentSize {}
+- (BOOL)adjustsFontSizeToFitContentSize { return YES; }
+
 @end
+
 

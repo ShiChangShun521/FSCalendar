@@ -18,6 +18,7 @@
 @property (readonly, nonatomic) UIColor *colorForTitleLabel;
 @property (readonly, nonatomic) UIColor *colorForSubtitleLabel;
 @property (readonly, nonatomic) UIColor *colorForCellBorder;
+@property (readonly, nonatomic) UIColor *colorForCellOutsideBorder;
 @property (readonly, nonatomic) NSArray<UIColor *> *colorsForEvents;
 @property (readonly, nonatomic) CGFloat borderRadius;
 
@@ -49,6 +50,8 @@
 {   
     UILabel *label;
     CAShapeLayer *shapeLayer;
+    CAShapeLayer *outShaplayer;
+    UIView *shapLayerView;
     UIImageView *imageView;
     FSCalendarEventIndicator *eventIndicator;
     
@@ -79,9 +82,24 @@
     self.eventIndicator = eventIndicator;
     
     imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    imageView.contentMode = UIViewContentModeBottom|UIViewContentModeCenter;
+//    imageView.contentMode = UIViewContentModeBottom|UIViewContentModeCenter;
+    imageView.contentMode = UIViewContentModeScaleToFill;
     [self.contentView addSubview:imageView];
     self.imageView = imageView;
+    
+    shapLayerView = [UIView new];
+    shapLayerView.backgroundColor = [UIColor clearColor];
+    [self.contentView insertSubview:shapLayerView atIndex:1000];
+    self.outsideView = shapLayerView;
+    
+    outShaplayer = [CAShapeLayer layer];
+    outShaplayer.backgroundColor = [UIColor clearColor].CGColor;
+    outShaplayer.borderWidth = 1.0;
+    outShaplayer.borderColor = [UIColor clearColor].CGColor;
+    outShaplayer.opacity = 0;
+    [shapLayerView.layer addSublayer:outShaplayer];
+    
+    self.outsideShapLayer = outShaplayer;
     
     self.clipsToBounds = NO;
     self.contentView.clipsToBounds = NO;
@@ -91,6 +109,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
     if (_subtitle) {
         _subtitleLabel.text = _subtitle;
         if (_subtitleLabel.hidden) {
@@ -106,19 +125,29 @@
         CGFloat titleHeight = self.titleLabel.font.lineHeight;
         CGFloat subtitleHeight = self.subtitleLabel.font.lineHeight;
         
-        CGFloat height = titleHeight + subtitleHeight;
-        _titleLabel.frame = CGRectMake(
-                                       self.preferredTitleOffset.x,
-                                       (self.contentView.fs_height*5.0/6.0-height)*0.5+self.preferredTitleOffset.y,
-                                       self.contentView.fs_width,
-                                       titleHeight
-                                       );
-        _subtitleLabel.frame = CGRectMake(
-                                          self.preferredSubtitleOffset.x,
-                                          (_titleLabel.fs_bottom-self.preferredTitleOffset.y) - (_titleLabel.fs_height-_titleLabel.font.pointSize)+self.preferredSubtitleOffset.y,
-                                          self.contentView.fs_width,
-                                          subtitleHeight
-                                          );
+        if (_subTitleIsOutsideCircle) {
+            _titleLabel.frame = CGRectMake(
+                                           self.preferredTitleOffset.x,
+                                           self.preferredTitleOffset.y,
+                                           self.contentView.fs_width,
+                                           floor(self.contentView.fs_height*5.0/6.0)
+                                           );
+            _subtitleLabel.frame =  CGRectMake( self.preferredSubtitleOffset.x,_titleLabel.frame.size.height-2,self.contentView.fs_width,subtitleHeight);
+        }else{
+            CGFloat height = titleHeight + subtitleHeight;
+            _titleLabel.frame = CGRectMake(
+                                           self.preferredTitleOffset.x,
+                                           (self.contentView.fs_height*5.0/6.0-height)*0.5+self.preferredTitleOffset.y,
+                                           self.contentView.fs_width,
+                                           titleHeight
+                                           );
+            _subtitleLabel.frame = CGRectMake(
+                                              self.preferredSubtitleOffset.x,
+                                              (_titleLabel.fs_bottom-self.preferredTitleOffset.y) - (_titleLabel.fs_height-_titleLabel.font.pointSize)+self.preferredSubtitleOffset.y,
+                                              self.contentView.fs_width,
+                                              subtitleHeight
+                                              );
+        }
     } else {
         _titleLabel.frame = CGRectMake(
                                        self.preferredTitleOffset.x,
@@ -128,7 +157,7 @@
                                        );
     }
     
-    _imageView.frame = CGRectMake(self.preferredImageOffset.x, self.preferredImageOffset.y, self.contentView.fs_width, self.contentView.fs_height);
+//    _imageView.frame = CGRectMake(self.preferredImageOffset.x, self.preferredImageOffset.y, self.contentView.fs_width, self.contentView.fs_height);
     
     CGFloat titleHeight = self.bounds.size.height*5.0/6.0;
     CGFloat diameter = MIN(self.bounds.size.height*5.0/6.0,self.bounds.size.width);
@@ -137,20 +166,59 @@
                                    (titleHeight-diameter)/2,
                                    diameter,
                                    diameter);
-    
+    _imageView.frame = CGRectMake(_shapeLayer.frame.origin.x, _shapeLayer.frame.origin.y, diameter, diameter);
     CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:_shapeLayer.bounds
                                                 cornerRadius:CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius].CGPath;
     if (!CGPathEqualToPath(_shapeLayer.path,path)) {
         _shapeLayer.path = path;
     }
+    _outsideView.frame = CGRectMake((self.contentView.bounds.size.width-diameter-4)/2,
+                                   (titleHeight-diameter-4)/2,
+                                   diameter+4,
+                                   diameter+4);
+    _outsideShapLayer.frame = _outsideView.bounds;
     
-    CGFloat eventSize = _shapeLayer.frame.size.height/6.0;
+    UIColor *outsideBorderColor = self.colorForCellOutsideBorder;
+    BOOL shouldHideOutsideLayer = outsideBorderColor;
+    
+    if (shouldHideOutsideLayer) {
+        if(self.appearance.borderType == 1){
+            _outsideShapLayer.opacity = 1;
+            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:self.outsideShapLayer.bounds cornerRadius:CGRectGetWidth(_outsideShapLayer.bounds)*0.5*self.borderRadius];
+            _outsideShapLayer.strokeColor = outsideBorderColor.CGColor;
+            _outsideShapLayer.fillColor = [UIColor clearColor].CGColor;
+            _outsideShapLayer.path = path.CGPath;
+            _outsideShapLayer.lineWidth = 1;
+            _outsideShapLayer.lineCap = @"butt";
+            //虚线每段长度和间隔
+            _outsideShapLayer.lineDashPattern = @[@(2), @(2)];
+            
+        }else if (self.appearance.borderType == 2){
+            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:self.outsideShapLayer.bounds cornerRadius:CGRectGetWidth(_outsideShapLayer.bounds)*0.5*self.borderRadius];
+            _outsideShapLayer.strokeColor = outsideBorderColor.CGColor;
+            _outsideShapLayer.fillColor = [UIColor clearColor].CGColor;
+            _outsideShapLayer.path = path.CGPath;
+            _outsideShapLayer.opacity = 1;
+        }else{
+            _outsideShapLayer.opacity = 0;
+        }
+    }else{
+        _outsideShapLayer.opacity = 0;
+    }
+    
+//    CGFloat eventSize = _shapeLayer.frame.size.height/6.0;
+//    _eventIndicator.frame = CGRectMake(
+//                                       self.preferredEventOffset.x,
+//                                       CGRectGetMaxY(_shapeLayer.frame)+eventSize*0.17+self.preferredEventOffset.y,
+//                                       self.fs_width,
+//                                       eventSize*0.83
+//                                      );
     _eventIndicator.frame = CGRectMake(
-                                       self.preferredEventOffset.x,
-                                       CGRectGetMaxY(_shapeLayer.frame)+eventSize*0.17+self.preferredEventOffset.y,
-                                       self.fs_width,
-                                       eventSize*0.83
-                                      );
+                                       self.contentView.fs_width - 8,
+                                       3,
+                                       5,
+                                       5
+                                       );
     
 }
 
@@ -161,6 +229,7 @@
         [CATransaction setDisableActions:YES]; // Avoid blink of shape layer.
     }
     self.shapeLayer.opacity = 0;
+    self.outsideShapLayer.opacity = 1;
     [self.contentView.layer removeAnimationForKey:@"opacity"];
 }
 
@@ -169,21 +238,25 @@
 - (void)performSelecting
 {
     _shapeLayer.opacity = 1;
-        
+    
+#define kAnimationDuration FSCalendarDefaultBounceAnimationDuration
+    
     CAAnimationGroup *group = [CAAnimationGroup animation];
     CABasicAnimation *zoomOut = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     zoomOut.fromValue = @0.3;
     zoomOut.toValue = @1.2;
-    zoomOut.duration = FSCalendarDefaultBounceAnimationDuration/4*3;
+    zoomOut.duration = kAnimationDuration/4*3;
     CABasicAnimation *zoomIn = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     zoomIn.fromValue = @1.2;
     zoomIn.toValue = @1.0;
-    zoomIn.beginTime = FSCalendarDefaultBounceAnimationDuration/4*3;
-    zoomIn.duration = FSCalendarDefaultBounceAnimationDuration/4;
-    group.duration = FSCalendarDefaultBounceAnimationDuration;
+    zoomIn.beginTime = kAnimationDuration/4*3;
+    zoomIn.duration = kAnimationDuration/4;
+    group.duration = kAnimationDuration;
     group.animations = @[zoomOut, zoomIn];
     [_shapeLayer addAnimation:group forKey:@"bounce"];
     [self configureAppearance];
+    
+#undef kAnimationDuration
     
 }
 
@@ -211,9 +284,12 @@
     }
     
     UIColor *borderColor = self.colorForCellBorder;
+    
     UIColor *fillColor = self.colorForCellFill;
     
     BOOL shouldHideShapeLayer = !self.selected && !self.dateIsToday && !borderColor && !fillColor;
+    
+//    BOOL shouldHideOutsideLayer = outsideBorderColor;
     
     if (_shapeLayer.opacity == shouldHideShapeLayer) {
         _shapeLayer.opacity = !shouldHideShapeLayer;
@@ -235,12 +311,18 @@
         if (!CGPathEqualToPath(_shapeLayer.path, path)) {
             _shapeLayer.path = path;
         }
-        
     }
     
-    if (![_image isEqual:_imageView.image]) {
-        _imageView.image = _image;
-        _imageView.hidden = !_image;
+    
+//    if (![_image isEqual:_imageView.image]) {
+//        _imageView.image = _image;
+//        _imageView.hidden = !_image;
+//    }
+    _imageView.image = nil;
+    if (_dateIsToday) {
+        if ([self.appearance.todayColor isEqual:[UIColor orangeColor]]) {
+            _imageView.image = [UIImage imageNamed:@"todayBg"];
+        }
     }
     
     if (_eventIndicator.hidden == (_numberOfEvents > 0)) {
@@ -304,6 +386,11 @@
         return _preferredBorderSelectionColor ?: _appearance.borderSelectionColor;
     }
     return _preferredBorderDefaultColor ?: _appearance.borderDefaultColor;
+}
+//ziji
+- (UIColor *)colorForCellOutsideBorder
+{
+    return _preferredOutsideBorderDefaultColor;
 }
 
 - (NSArray<UIColor *> *)colorsForEvents

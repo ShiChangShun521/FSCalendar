@@ -17,6 +17,7 @@
 #import "FSCalendarStickyHeader.h"
 #import "FSCalendarCollectionView.h"
 #import "FSCalendarCollectionViewLayout.h"
+#import "FSCalendarScopeHandle.h"
 #import "FSCalendarCalculator.h"
 #import "FSCalendarTransitionCoordinator.h"
 #import "FSCalendarDelegationProxy.h"
@@ -24,6 +25,7 @@
 @interface FSCalendar (Dynamic)
 
 @property (readonly, nonatomic) FSCalendarCollectionView *collectionView;
+@property (readonly, nonatomic) FSCalendarScopeHandle *scopeHandle;
 @property (readonly, nonatomic) FSCalendarCollectionViewLayout *collectionViewLayout;
 @property (readonly, nonatomic) FSCalendarTransitionCoordinator *transitionCoordinator;
 @property (readonly, nonatomic) FSCalendarCalculator *calculator;
@@ -34,6 +36,7 @@
 @property (readonly, nonatomic) UIView *bottomBorder;
 
 @property (readonly, nonatomic) NSCalendar *gregorian;
+@property (readonly, nonatomic) NSDateComponents *components;
 @property (readonly, nonatomic) NSDateFormatter *formatter;
 
 @property (readonly, nonatomic) UIView *contentView;
