@@ -19,6 +19,7 @@
 @property (readonly, nonatomic) UIColor *colorForSubtitleLabel;
 @property (readonly, nonatomic) UIColor *colorForCellBorder;
 @property (readonly, nonatomic) UIColor *colorForCellOutsideBorder;
+@property (readonly, nonatomic) UIColor *colorForCellOutsideBorderNodot;
 @property (readonly, nonatomic) NSArray<UIColor *> *colorsForEvents;
 @property (readonly, nonatomic) CGFloat borderRadius;
 
@@ -51,9 +52,16 @@
     UILabel *label;
     CAShapeLayer *shapeLayer;
     CAShapeLayer *outShaplayer;
+    CAShapeLayer *newOutShaplayer;
     UIView *shapLayerView;
     UIImageView *imageView;
     FSCalendarEventIndicator *eventIndicator;
+    
+    imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    //    imageView.contentMode = UIViewContentModeBottom|UIViewContentModeCenter;
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    [self.contentView addSubview:imageView];
+    self.imageView = imageView;
     
     label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.textAlignment = NSTextAlignmentCenter;
@@ -81,11 +89,7 @@
     [self.contentView addSubview:eventIndicator];
     self.eventIndicator = eventIndicator;
     
-    imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-//    imageView.contentMode = UIViewContentModeBottom|UIViewContentModeCenter;
-    imageView.contentMode = UIViewContentModeScaleToFill;
-    [self.contentView addSubview:imageView];
-    self.imageView = imageView;
+    
     
     shapLayerView = [UIView new];
     shapLayerView.backgroundColor = [UIColor clearColor];
@@ -100,6 +104,16 @@
     [shapLayerView.layer addSublayer:outShaplayer];
     
     self.outsideShapLayer = outShaplayer;
+    
+    
+    newOutShaplayer = [CAShapeLayer layer];
+    newOutShaplayer.backgroundColor = [UIColor clearColor].CGColor;
+    newOutShaplayer.borderWidth = 1.0;
+    newOutShaplayer.borderColor = [UIColor clearColor].CGColor;
+    newOutShaplayer.opacity = 0;
+    [shapLayerView.layer addSublayer:newOutShaplayer];
+    
+    self.outsideShapLayerNoDot = newOutShaplayer;
     
     self.clipsToBounds = NO;
     self.contentView.clipsToBounds = NO;
@@ -178,6 +192,8 @@
                                    diameter+4);
     _outsideShapLayer.frame = _outsideView.bounds;
     
+    _outsideShapLayerNoDot.frame = _outsideView.bounds;
+    
     UIColor *outsideBorderColor = self.colorForCellOutsideBorder;
     BOOL shouldHideOutsideLayer = outsideBorderColor;
     
@@ -205,7 +221,17 @@
     }else{
         _outsideShapLayer.opacity = 0;
     }
-    
+    UIColor *newOutsideBorderColor = self.colorForCellOutsideBorderNodot;
+    if (newOutsideBorderColor){
+        UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:self.outsideShapLayerNoDot.bounds cornerRadius:CGRectGetWidth(self.outsideShapLayerNoDot.bounds)*0.5*self.borderRadius];
+        self.outsideShapLayerNoDot.strokeColor = newOutsideBorderColor.CGColor;
+        self.outsideShapLayerNoDot.fillColor = [UIColor clearColor].CGColor;
+        self.outsideShapLayerNoDot.path = path.CGPath;
+        self.outsideShapLayerNoDot.opacity = 1;
+        
+    }else{
+        self.outsideShapLayerNoDot.opacity = 0;
+    }
 //    CGFloat eventSize = _shapeLayer.frame.size.height/6.0;
 //    _eventIndicator.frame = CGRectMake(
 //                                       self.preferredEventOffset.x,
@@ -230,6 +256,7 @@
     }
     self.shapeLayer.opacity = 0;
     self.outsideShapLayer.opacity = 1;
+    self.outsideShapLayerNoDot.opacity = 1;
     [self.contentView.layer removeAnimationForKey:@"opacity"];
 }
 
@@ -387,10 +414,15 @@
     }
     return _preferredBorderDefaultColor ?: _appearance.borderDefaultColor;
 }
-//ziji
+//虚线圈颜色
 - (UIColor *)colorForCellOutsideBorder
 {
     return _preferredOutsideBorderDefaultColor;
+}
+//实线圈颜色
+- (UIColor *)colorForCellOutsideBorderNodot
+{
+    return _preferredOutsideBorderDefaultColorNoDot;
 }
 
 - (NSArray<UIColor *> *)colorsForEvents

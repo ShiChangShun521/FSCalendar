@@ -1479,6 +1479,7 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
     }
     FSCalendarInvalidateCellAppearance(preferredBorderDefaultColor,borderDefaultColorForDate);
     FSCalendarInvalidateCellAppearance(preferredOutsideBorderDefaultColor,dotBorderDefaultColorForDate);
+    FSCalendarInvalidateCellAppearance(preferredOutsideBorderDefaultColorNoDot,NewBorderDefaultColorForDate);
     FSCalendarInvalidateCellAppearance(preferredBorderSelectionColor,borderSelectionColorForDate);
     FSCalendarInvalidateCellAppearanceWithDefault(preferredBorderRadius,borderRadiusForDate,-1);
 

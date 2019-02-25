@@ -39,6 +39,8 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 @property (weak, nonatomic) CAShapeLayer *shapeLayer;
 /**外层的*/
 @property (nonatomic,weak) CAShapeLayer *outsideShapLayer;
+//外层实线圈
+@property (nonatomic,weak) CAShapeLayer *outsideShapLayerNoDot;
 
 @property (nonatomic,weak) UIView *outsideView;
 
@@ -79,7 +81,8 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 @property (strong, nonatomic) UIColor *preferredSubtitleDefaultColor;
 @property (strong, nonatomic) UIColor *preferredSubtitleSelectionColor;
 @property (strong, nonatomic) UIColor *preferredBorderDefaultColor;
-@property (strong, nonatomic)  UIColor *preferredOutsideBorderDefaultColor;
+@property (strong, nonatomic) UIColor *preferredOutsideBorderDefaultColor;//虚线圈
+@property (strong, nonatomic) UIColor *preferredOutsideBorderDefaultColorNoDot;//实线圈
 @property (strong, nonatomic) UIColor *preferredBorderSelectionColor;
 @property (assign, nonatomic) CGPoint preferredTitleOffset;
 @property (assign, nonatomic) CGPoint preferredSubtitleOffset;

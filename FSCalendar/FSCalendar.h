@@ -222,6 +222,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance dotBorderDefaultColorForDate:(NSDate *)date;
 
+/**实线边框
+ */
+- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance NewBorderDefaultColorForDate:(NSDate *)date;
+
 /**
  * Asks the delegate for a border color in selected state for the specific date.
  */
