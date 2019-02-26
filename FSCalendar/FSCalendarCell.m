@@ -59,9 +59,14 @@
     
     imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     //    imageView.contentMode = UIViewContentModeBottom|UIViewContentModeCenter;
-    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    imageView.contentMode = UIViewContentModeScaleToFill;
     [self.contentView addSubview:imageView];
     self.imageView = imageView;
+    UIImageView *bottomImg = [[UIImageView alloc]init];
+    bottomImg.contentMode = UIViewContentModeScaleToFill;
+    self.bottomView = bottomImg;
+    
+    [self.contentView addSubview:_bottomView];
     
     label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.textAlignment = NSTextAlignmentCenter;
@@ -181,6 +186,10 @@
                                    diameter,
                                    diameter);
     _imageView.frame = CGRectMake(_shapeLayer.frame.origin.x, _shapeLayer.frame.origin.y, diameter, diameter);
+    _imageView.clipsToBounds = YES;
+    
+    _bottomView.frame = CGRectMake(_shapeLayer.frame.origin.x+5, _shapeLayer.frame.origin.y + diameter, diameter-10, 2);
+    
     CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:_shapeLayer.bounds
                                                 cornerRadius:CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius].CGPath;
     if (!CGPathEqualToPath(_shapeLayer.path,path)) {

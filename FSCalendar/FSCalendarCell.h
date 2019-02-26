@@ -49,6 +49,7 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
  */
 @property (weak, nonatomic) UIImageView *imageView;
 
+@property (nonatomic,weak) UIImageView *bottomView;
 
 /**
  The collection of event dots of the cell
